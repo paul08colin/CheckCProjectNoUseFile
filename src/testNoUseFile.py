@@ -44,20 +44,7 @@ def dijkstra(graphV, graphE):
             if (graphE[minVindex][i] + graphV[minVindex] < graphV[i]):
                 graphV[i] = graphE[minVindex][i] + graphV[minVindex];
 
-def buildGraph(canOpenFile):
-    fileNameToNum = {}
-    numToFileName = {}
-    graphE = [] 
-    graphV = []
-    dropFile = []
-    fileNum = 0
-    rootNum = 0
-    for file in canOpenFile:
-            includeFileName = GetShortestName(file)
-            if (includeFileName not in fileNameToNum):
-                fileNum = fileNum + 1 
-                fileNameToNum[includeFileName]  = fileNum
-                numToFileName[fileNum] =  includeFileName
+def buildGraph(fileNameToNum, graphE, graphV):
     if (mainFileName in fileNameToNum):
         rootNum = fileNameToNum[mainFileName];
     else:
@@ -84,11 +71,30 @@ def buildGraph(canOpenFile):
                 tempStr = tempStr.split('.')
                 if (tempStr[-2] in fileNameToNum):
                     graphE[theFileNum - 1][fileNameToNum[tempStr[-2]] - 1] = 1
+
+
+def CalcUselessFile(canOpenFile):
+    fileNameToNum = {}
+    numToFileName = {}
+    graphE = [] 
+    graphV = []
+    dropFile = []
+    fileNum = 0
+    rootNum = 0
+    ShortNameToLongName = {}
+    for file in canOpenFile:
+            includeFileName = GetShortestName(file)
+            ShortNameToLongName[includeFileName] = file;
+            if (includeFileName not in fileNameToNum):
+                fileNum = fileNum + 1 
+                fileNameToNum[includeFileName]  = fileNum
+                numToFileName[fileNum] =  includeFileName
+    buildGraph(fileNameToNum, graphE, graphV)
     dijkstra(graphV, graphE)
     print ("output useless file")
     for i in range(0, len(graphV)):
             if (graphV[i] == math.inf):
-                print (numToFileName[i + 1])
+                print (ShortNameToLongName[numToFileName[i + 1]])
 
 
 canOpenFile = []
@@ -98,7 +104,7 @@ for file in canOpenFile:
     nameList = file.split('/')
     shortName = nameList[-1]
     shortNameOpenFile.append(shortName)
-buildGraph(canOpenFile)
+CalcUselessFile(canOpenFile)
 
 
 
